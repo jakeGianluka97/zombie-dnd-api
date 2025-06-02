@@ -23,10 +23,6 @@ def crea_personaggio(p: dict, db: Session = Depends(get_db)):
     return {"msg": f"Creato {personaggio.nome}", "id": personaggio.id}
 
 @router.get("/personaggi/")
-def lista():
-    return personaggi
-
-@router.get("/personaggi/")
 def lista_personaggi(db: Session = Depends(get_db)):
     return db.query(PersonaggioDB).all()
 
