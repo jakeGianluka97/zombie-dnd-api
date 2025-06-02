@@ -2,7 +2,10 @@ openapi: 3.0.0
 info:
   title: Zombie DnD API
   version: 1.0.0
-  description: API per la gestione di un gioco narrativo zombie integrato con GPT
+  description: API persistente per un'avventura D&D ambientata nel mondo di The Walking Dead
+
+servers:
+  - url: https://zombie-dnd-api.onrender.com
 
 paths:
   /personaggi/:
@@ -27,9 +30,8 @@ paths:
                     type: string
                   id:
                     type: string
-
     get:
-      summary: Elenco di tutti i personaggi
+      summary: Elenco personaggi
       operationId: listaPersonaggi
       responses:
         '200':
@@ -37,23 +39,23 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
+                type: array
+                items:
                   $ref: '#/components/schemas/Personaggio'
 
   /personaggi/{id}:
     get:
-      summary: Recupera un personaggio tramite ID
+      summary: Recupera un personaggio
       operationId: getPersonaggio
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Dettagli del personaggio
+          description: Dettaglio personaggio
           content:
             application/json:
               schema:
@@ -64,29 +66,29 @@ paths:
       summary: Crea o aggiorna una relazione
       operationId: aggiornaRelazione
       parameters:
-        - name: id_da
-          in: query
+        - in: query
+          name: id_da
           required: true
           schema:
             type: string
-        - name: id_a
-          in: query
+        - in: query
+          name: id_a
           required: true
           schema:
             type: string
-        - name: tipo
-          in: query
+        - in: query
+          name: tipo
           required: true
           schema:
             type: string
-        - name: fiducia
-          in: query
+        - in: query
+          name: fiducia
           required: false
           schema:
             type: integer
       responses:
         '200':
-          description: Relazione aggiornata
+          description: Risposta
           content:
             application/json:
               schema:
@@ -94,6 +96,210 @@ paths:
                 properties:
                   msg:
                     type: string
+
+  /relazione/fiducia/:
+    put:
+      summary: Modifica la fiducia di una relazione
+      operationId: modificaFiducia
+      parameters:
+        - in: query
+          name: id_da
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: id_a
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: variazione
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Risposta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+
+  /dado/:
+    get:
+      summary: Lancia un dado
+      operationId: tiraDado
+      parameters:
+        - in: query
+          name: lati
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: modificatore
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Risultato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tiro:
+                    type: integer
+                  modificatore:
+                    type: integer
+                  totale:
+                    type: integer
+                  esito:
+                    type: string
+
+  /duello/:
+    get:
+      summary: Tiro contrapposto
+      operationId: duello
+      parameters:
+        - in: query
+          name: mod_utente
+          schema:
+            type: integer
+        - in: query
+          name: mod_nemico
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Risultato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  utente:
+                    type: integer
+                  nemico:
+                    type: integer
+                  esito:
+                    type: string
+
+  /azione/:
+    post:
+      summary: Azione narrativa
+      operationId: azioneNarrativa
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: tipo
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: abilita
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: difficolta
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Risultato azione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tiro:
+                    type: integer
+                  totale:
+                    type: integer
+                  esito:
+                    type: string
+                  critico:
+                    type: string
+                  effetti:
+                    type: array
+                    items:
+                      type: string
+
+  /evento-casuale/:
+    get:
+      summary: Genera evento casuale
+      operationId: eventoCasuale
+      responses:
+        '200':
+          description: Evento
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tipo:
+                    type: string
+                  evento:
+                    type: string
+
+  /luoghi/:
+    get:
+      summary: Elenco luoghi
+      operationId: elencoLuoghi
+      responses:
+        '200':
+          description: Mappa
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  /spostamento/:
+    post:
+      summary: Sposta personaggio
+      operationId: spostaPersonaggio
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: destinazione
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Risultato spostamento
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personaggio:
+                    type: string
+                  da:
+                    type: string
+                  a:
+                    type: string
+                  evento:
+                    type: string
+                  salute_attuale:
+                    type: integer
 
 components:
   schemas:
@@ -112,6 +318,14 @@ components:
           type: string
         stato:
           type: string
+        salute:
+          type: integer
+        sanita_mentale:
+          type: integer
+        inventario:
+          type: object
+          additionalProperties:
+            type: integer
         relazioni:
           type: object
           additionalProperties:
@@ -121,191 +335,9 @@ components:
                 type: string
               fiducia:
                 type: integer
-        salute:
-          type: integer
-        sanita_mentale:
-          type: integer
-        inventario:
-          type: object
-          additionalProperties:
-            type: integer
         competenze:
           type: array
           items:
             type: string
         ultimo_luogo:
           type: string
-  /dado/:
-    get:
-      summary: Tira un dado con modificatore
-      operationId: tiraDado
-      parameters:
-        - name: lati
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 20
-        - name: modificatore
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-      responses:
-        '200':
-          description: Risultato del dado
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tiro:
-                    type: integer
-                  modificatore:
-                    type: integer
-                  totale:
-                    type: integer
-                  esito:
-                    type: string
-
-  /duello/:
-    get:
-      summary: Tiro contrapposto tra utente e nemico
-      operationId: duello
-      parameters:
-        - name: mod_utente
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: mod_nemico
-          in: query
-          required: false
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Risultato del duello
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  utente:
-                    type: integer
-                  nemico:
-                    type: integer
-                  esito:
-                    type: string
-  /azione/:
-    post:
-      summary: Esegue un'azione narrativa basata su abilità
-      operationId: azioneNarrativa
-      parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: tipo
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: abilita
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: difficolta
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 15
-      responses:
-        '200':
-          description: Risultato dell'azione
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tiro:
-                    type: integer
-                  totale:
-                    type: integer
-                  esito:
-                    type: string
-                  critico:
-                    type: string
-                  effetti:
-                    type: array
-                    items:
-                      type: string
-  /evento-casuale/:
-    get:
-      summary: Genera un evento casuale narrativo
-      operationId: eventoCasuale
-      responses:
-        '200':
-          description: Evento generato
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tipo:
-                    type: string
-                  evento:
-                    type: string
-  /luoghi/:
-    get:
-      summary: Elenco luoghi disponibili
-      operationId: elencoLuoghi
-      responses:
-        '200':
-          description: Mappa dei luoghi
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: array
-                  items:
-                    type: string
-
-  /spostamento/:
-    post:
-      summary: Sposta un personaggio in un nuovo luogo
-      operationId: spostaPersonaggio
-      parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: destinazione
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Risultato dello spostamento
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  personaggio:
-                    type: string
-                  da:
-                    type: string
-                  a:
-                    type: string
-                  evento:
-                    type: string
-                  salute_attuale:
-                    type: integer

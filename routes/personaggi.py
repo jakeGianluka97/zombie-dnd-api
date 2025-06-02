@@ -6,6 +6,13 @@ from database import SessionLocal
 
 router = APIRouter()
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 @router.post("/personaggi/")
 def crea_personaggio(p: dict, db: Session = Depends(get_db)):
     p["id"] = str(uuid.uuid4())

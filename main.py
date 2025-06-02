@@ -7,6 +7,12 @@ app = FastAPI()
 @app.get("/")
 def home():
     return {"msg": "API Zombie D&D attiva"}
+    from fastapi.responses import FileResponse
+
+@app.get("/openapi.yaml", include_in_schema=False)
+def serve_openapi():
+    return FileResponse("openapi.yaml", media_type='application/yaml')
+
 
 app.include_router(personaggi.router)
 app.include_router(tiri.router)
