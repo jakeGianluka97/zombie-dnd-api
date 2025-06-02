@@ -44,16 +44,23 @@ def get_personaggio(id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/relazione/")
-def aggiorna_relazione(id_da: str, id_a: str, tipo: str, fiducia: int = 50, db: Session = Depends(get_db)):
+def aggiorna_relazione(id_da: str, id_a: str, tipo: str, fiducia: int = 50, bidirezionale: bool = True, db: Session = Depends(get_db)):
     p1 = db.query(PersonaggioDB).filter(PersonaggioDB.id == id_da).first()
     p2 = db.query(PersonaggioDB).filter(PersonaggioDB.id == id_a).first()
 
     if not p1 or not p2:
         return {"errore": "ID non validi"}
 
-    relazioni = p1.relazioni or {}
-    relazioni[id_a] = {"tipo": tipo, "fiducia": min(max(fiducia, 0), 100)}
-    p1.relazioni = relazioni
+    # Aggiorna la relazione da p1 a p2
+    relazioni_p1 = p1.relazioni or {}
+    relazioni_p1[id_a] = {"tipo": tipo, "fiducia": min(max(fiducia, 0), 100)}
+    p1.relazioni = relazioni_p1
+
+    # Se bidirezionale, aggiorna anche la relazione da p2 a p1
+    if bidirezionale:
+        relazioni_p2 = p2.relazioni or {}
+        relazioni_p2[id_da] = {"tipo": tipo, "fiducia": min(max(fiducia, 0), 100)}
+        p2.relazioni = relazioni_p2
 
     db.commit()
     return {"msg": f"Relazione {tipo} (fiducia {fiducia}) tra {id_da} e {id_a}"}
