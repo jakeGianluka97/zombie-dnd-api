@@ -4,7 +4,6 @@ from database import SessionLocal
 from models_sql import PersonaggioDB
 
 
-router = APIRouter()
 def get_db():
     db = SessionLocal()
     try:

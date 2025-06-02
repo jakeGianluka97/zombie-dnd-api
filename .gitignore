@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.p~
+
+
+# Virtual environment
+env/
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+.coverage
+.pytest_cache/
+
+# Logs
+*.log
+
+# Env files
+.env
+*.env
+
+# Bytecode cache
+__pycache__/
+*.py[cod]
+
+# DB / migrations (opzionali)
+*.sqlite3
+*.db
+
+# Build
+build/
+dist/
+*.egg-info/
