@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from database.memoria import gioco_stato
 import random
 
 router = APIRouter()

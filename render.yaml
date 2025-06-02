@@ -8,3 +8,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10
+      - key: DATABASE_URL
+        value: "postgresql://zombie_db_ygt2_user:wwlSORNlTIZftgtEGGvbWnIJ4Veyq0rt@dpg-d0uu13adbo4c73bm9qj0-a/zombie_db_ygt2"
