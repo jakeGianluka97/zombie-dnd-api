@@ -1,8 +1,10 @@
 import json
+import uuid
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 from models_sql import PersonaggioDB
 from database import SessionLocal
+
 
 router = APIRouter()
 
