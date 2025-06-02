@@ -1,0 +1,311 @@
+openapi: 3.0.0
+info:
+  title: Zombie DnD API
+  version: 1.0.0
+  description: API per la gestione di un gioco narrativo zombie integrato con GPT
+
+paths:
+  /personaggi/:
+    post:
+      summary: Crea un nuovo personaggio
+      operationId: creaPersonaggio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Personaggio'
+      responses:
+        '200':
+          description: Personaggio creato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  id:
+                    type: string
+
+    get:
+      summary: Elenco di tutti i personaggi
+      operationId: listaPersonaggi
+      responses:
+        '200':
+          description: Lista personaggi
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Personaggio'
+
+  /personaggi/{id}:
+    get:
+      summary: Recupera un personaggio tramite ID
+      operationId: getPersonaggio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dettagli del personaggio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Personaggio'
+
+  /relazione/:
+    post:
+      summary: Crea o aggiorna una relazione
+      operationId: aggiornaRelazione
+      parameters:
+        - name: id_da
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: id_a
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: fiducia
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Relazione aggiornata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+
+components:
+  schemas:
+    Personaggio:
+      type: object
+      properties:
+        id:
+          type: string
+        nome:
+          type: string
+        eta:
+          type: integer
+        ruolo:
+          type: string
+        lingua:
+          type: string
+        stato:
+          type: string
+        relazioni:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              tipo:
+                type: string
+              fiducia:
+                type: integer
+        salute:
+          type: integer
+        sanita_mentale:
+          type: integer
+        inventario:
+          type: object
+          additionalProperties:
+            type: integer
+        competenze:
+          type: array
+          items:
+            type: string
+        ultimo_luogo:
+          type: string
+  /dado/:
+    get:
+      summary: Tira un dado con modificatore
+      operationId: tiraDado
+      parameters:
+        - name: lati
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: modificatore
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Risultato del dado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tiro:
+                    type: integer
+                  modificatore:
+                    type: integer
+                  totale:
+                    type: integer
+                  esito:
+                    type: string
+
+  /duello/:
+    get:
+      summary: Tiro contrapposto tra utente e nemico
+      operationId: duello
+      parameters:
+        - name: mod_utente
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: mod_nemico
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Risultato del duello
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  utente:
+                    type: integer
+                  nemico:
+                    type: integer
+                  esito:
+                    type: string
+  /azione/:
+    post:
+      summary: Esegue un'azione narrativa basata su abilità
+      operationId: azioneNarrativa
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: abilita
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: difficolta
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Risultato dell'azione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tiro:
+                    type: integer
+                  totale:
+                    type: integer
+                  esito:
+                    type: string
+                  critico:
+                    type: string
+                  effetti:
+                    type: array
+                    items:
+                      type: string
+  /evento-casuale/:
+    get:
+      summary: Genera un evento casuale narrativo
+      operationId: eventoCasuale
+      responses:
+        '200':
+          description: Evento generato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tipo:
+                    type: string
+                  evento:
+                    type: string
+  /luoghi/:
+    get:
+      summary: Elenco luoghi disponibili
+      operationId: elencoLuoghi
+      responses:
+        '200':
+          description: Mappa dei luoghi
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  /spostamento/:
+    post:
+      summary: Sposta un personaggio in un nuovo luogo
+      operationId: spostaPersonaggio
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destinazione
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Risultato dello spostamento
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personaggio:
+                    type: string
+                  da:
+                    type: string
+                  a:
+                    type: string
+                  evento:
+                    type: string
+                  salute_attuale:
+                    type: integer
