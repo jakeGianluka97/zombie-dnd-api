@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import personaggi, tiri, eventi, mappa
+from routes import personaggi, tiri, eventi, mappa, eventi_sociali, azioni
 from database import Base, engine
 
 
@@ -13,9 +13,9 @@ def home():
 def serve_openapi():
     return FileResponse("openapi.yaml", media_type='application/yaml')
 
-
-app.include_router(personaggi.router)
-app.include_router(tiri.router)
-app.include_router(eventi.router)
-app.include_router(mappa.router)
+app.include_router(personaggi.router, tags=["personaggi"])
+app.include_router(eventi.router, tags=["eventi"])
+app.include_router(mappa.router, tags=["mappa"])
+app.include_router(azioni.router, tags=["azioni"])
+app.include_router(eventi_sociali.router, tags=["eventi-sociali"])
 Base.metadata.create_all(bind=engine)
