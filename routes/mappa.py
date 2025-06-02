@@ -2,8 +2,9 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 from database import SessionLocal
 from models_sql import PersonaggioDB
+from fastapi import APIRouter, Depends
 
-
+router = APIRouter()
 def get_db():
     db = SessionLocal()
     try:
