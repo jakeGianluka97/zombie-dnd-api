@@ -31,13 +31,13 @@ def aggiorna_comportamento(id: str, db: Session = Depends(get_db)):
     npc.ultima_intenzione = npc.intenzioni[0] if npc.intenzioni else None
     npc.intenzioni = [nuova_intenzione]
     if not npc.storico_intenzioni:
-    npc.storico_intenzioni = []
+        npc.storico_intenzioni = []
 
-    npc.storico_intenzioni.append({
-        "precedente": npc.intenzioni[0] if npc.intenzioni else None,
-        "nuova": nuova_intenzione,
-        "evento": evento if "evento" in locals() else "aggiornamento casuale"
-    })
+        npc.storico_intenzioni.append({
+            "precedente": npc.intenzioni[0] if npc.intenzioni else None,
+            "nuova": nuova_intenzione,
+            "evento": evento if "evento" in locals() else "aggiornamento casuale"
+        })
 
     db.commit()
 
@@ -59,13 +59,13 @@ def reagisci(id: str, evento: str, db: Session = Depends(get_db)):
     nnpc.ultima_intenzione = npc.intenzioni[0] if npc.intenzioni else None
     npc.intenzioni = [nuova_intenzione]
     if not npc.storico_intenzioni:
-    npc.storico_intenzioni = []
+        npc.storico_intenzioni = []
 
-    npc.storico_intenzioni.append({
-        "precedente": npc.intenzioni[0] if npc.intenzioni else None,
-        "nuova": nuova_intenzione,
-        "evento": evento if "evento" in locals() else "aggiornamento casuale"
-    })
+        npc.storico_intenzioni.append({
+            "precedente": npc.intenzioni[0] if npc.intenzioni else None,
+            "nuova": nuova_intenzione,
+            "evento": evento if "evento" in locals() else "aggiornamento casuale"
+        })
 
     genera_testo_evento("relazione", {
     "nome": npc.nome,
