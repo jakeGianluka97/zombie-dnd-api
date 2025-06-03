@@ -1,343 +1,875 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
-  title: Zombie DnD API
-  version: 1.0.0
-  description: API persistente per un'avventura D&D ambientata nel mondo di The Walking Dead
-
+  title: API Zombie D&D
+  version: 0.1.0
 servers:
-  - url: https://zombie-dnd-api.onrender.com
-
+- url: https://zombie-dnd-api.onrender.com
 paths:
   /personaggi/:
+    get:
+      tags:
+      - personaggi
+      summary: Lista Personaggi
+      operationId: lista_personaggi_personaggi__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
     post:
-      summary: Crea un nuovo personaggio
-      operationId: creaPersonaggio
+      tags:
+      - personaggi
+      summary: Crea Personaggio
+      operationId: crea_personaggio_personaggi__post
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Personaggio'
+              additionalProperties: true
+              type: object
+              title: P
+        required: true
       responses:
         '200':
-          description: Personaggio creato
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                  id:
-                    type: string
-    get:
-      summary: Elenco personaggi
-      operationId: listaPersonaggi
-      responses:
-        '200':
-          description: Lista personaggi
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Personaggio'
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /personaggi/{id}:
     get:
-      summary: Recupera un personaggio
-      operationId: getPersonaggio
+      tags:
+      - personaggi
+      summary: Get Personaggio
+      operationId: get_personaggio_personaggi__id__get
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
       responses:
         '200':
-          description: Dettaglio personaggio
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Personaggio'
-
-  /relazione/:
-    post:
-      summary: Crea o aggiorna una relazione
-      operationId: aggiornaRelazione
-      parameters:
-        - in: query
-          name: id_da
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: id_a
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: tipo
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: fiducia
-          required: false
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Risposta
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /relazione/fiducia/:
     put:
-      summary: Modifica la fiducia di una relazione
-      operationId: modificaFiducia
+      tags:
+      - personaggi
+      summary: Modifica Fiducia
+      operationId: modifica_fiducia_relazione_fiducia__put
       parameters:
-        - in: query
-          name: id_da
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: id_a
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: variazione
-          required: true
-          schema:
-            type: integer
+      - name: id_da
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id Da
+      - name: id_a
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id A
+      - name: variazione
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Variazione
       responses:
         '200':
-          description: Risposta
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
+  /personaggi/{id}/tratti:
+    get:
+      tags:
+      - personaggi
+      summary: Get Tratti
+      operationId: get_tratti_personaggi__id__tratti_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /dado/:
     get:
-      summary: Lancia un dado
-      operationId: tiraDado
+      tags:
+      - tiri
+      summary: Tira
+      operationId: tira_dado__get
       parameters:
-        - in: query
-          name: lati
-          required: false
-          schema:
-            type: integer
-        - in: query
-          name: modificatore
-          required: false
-          schema:
-            type: integer
+      - name: lati
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Lati
+      - name: modificatore
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          title: Modificatore
       responses:
         '200':
-          description: Risultato
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  tiro:
-                    type: integer
-                  modificatore:
-                    type: integer
-                  totale:
-                    type: integer
-                  esito:
-                    type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /duello/:
     get:
-      summary: Tiro contrapposto
-      operationId: duello
+      tags:
+      - tiri
+      summary: Duello
+      operationId: duello_duello__get
       parameters:
-        - in: query
-          name: mod_utente
-          schema:
-            type: integer
-        - in: query
-          name: mod_nemico
-          schema:
-            type: integer
+      - name: mod_utente
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          title: Mod Utente
+      - name: mod_nemico
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          title: Mod Nemico
       responses:
         '200':
-          description: Risultato
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  utente:
-                    type: integer
-                  nemico:
-                    type: integer
-                  esito:
-                    type: string
-
-  /azione/:
-    post:
-      summary: Azione narrativa
-      operationId: azioneNarrativa
-      parameters:
-        - in: query
-          name: id
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: tipo
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: abilita
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: difficolta
-          required: false
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Risultato azione
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tiro:
-                    type: integer
-                  totale:
-                    type: integer
-                  esito:
-                    type: string
-                  critico:
-                    type: string
-                  effetti:
-                    type: array
-                    items:
-                      type: string
-
-  /evento-casuale/:
-    get:
-      summary: Genera evento casuale
-      operationId: eventoCasuale
-      responses:
-        '200':
-          description: Evento
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tipo:
-                    type: string
-                  evento:
-                    type: string
-
-  /luoghi/:
-    get:
-      summary: Elenco luoghi
-      operationId: elencoLuoghi
-      responses:
-        '200':
-          description: Mappa
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: array
-                  items:
-                    type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /spostamento/:
     post:
-      summary: Sposta personaggio
-      operationId: spostaPersonaggio
+      tags:
+      - mappa
+      summary: Sposta Personaggio
+      operationId: sposta_personaggio_spostamento__post
       parameters:
-        - in: query
-          name: id
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: destinazione
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: destinazione
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Destinazione
       responses:
         '200':
-          description: Risultato spostamento
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  personaggio:
-                    type: string
-                  da:
-                    type: string
-                  a:
-                    type: string
-                  evento:
-                    type: string
-                  salute_attuale:
-                    type: integer
-
+                $ref: '#/components/schemas/HTTPValidationError'
+  /passa-tempo/:
+    post:
+      tags:
+      - mappa
+      summary: Passa Tempo
+      operationId: passa_tempo_passa_tempo__post
+      parameters:
+      - name: ore
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+          title: Ore
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /luoghi/:
+    get:
+      tags:
+      - luoghi
+      summary: Lista Luoghi
+      operationId: lista_luoghi_luoghi__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+    post:
+      tags:
+      - luoghi
+      summary: Crea Luogo
+      operationId: crea_luogo_luoghi__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Luogo
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /luoghi/{id}/collegamenti:
+    get:
+      tags:
+      - luoghi
+      summary: Collegamenti
+      operationId: collegamenti_luoghi__id__collegamenti_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/percezione/:
+    post:
+      tags:
+      - azioni
+      summary: Percezione
+      operationId: percezione_azioni_percezione__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 12
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/diplomazia/:
+    post:
+      tags:
+      - azioni
+      summary: Diplomazia
+      operationId: diplomazia_azioni_diplomazia__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 12
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/esplorazione/:
+    post:
+      tags:
+      - azioni
+      summary: Esplora
+      operationId: esplora_azioni_esplorazione__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: destinazione
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Destinazione
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 12
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/intuito/:
+    post:
+      tags:
+      - azioni
+      summary: Intuito
+      operationId: intuito_azioni_intuito__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 12
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/intimidazione/:
+    post:
+      tags:
+      - azioni
+      summary: Intimidazione
+      operationId: intimidazione_azioni_intimidazione__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 14
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/combattimento/:
+    post:
+      tags:
+      - azioni
+      summary: Combattimento
+      operationId: combattimento_azioni_combattimento__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 13
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/sopravvivenza/:
+    post:
+      tags:
+      - azioni
+      summary: Sopravvivenza
+      operationId: sopravvivenza_azioni_sopravvivenza__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 11
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /azioni/fuga/:
+    post:
+      tags:
+      - azioni
+      summary: Fuga
+      operationId: fuga_azioni_fuga__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: difficolta
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 13
+          title: Difficolta
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /missioni/genera-dinamica/:
+    post:
+      tags:
+      - missioni
+      summary: Genera Dinamica
+      operationId: genera_dinamica_missioni_genera_dinamica__post
+      parameters:
+      - name: evento
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Evento
+      - name: personaggio
+        in: query
+        required: false
+        schema:
+          type: string
+          title: Personaggio
+      - name: luogo
+        in: query
+        required: false
+        schema:
+          type: string
+          title: Luogo
+      - name: relazione
+        in: query
+        required: false
+        schema:
+          type: string
+          title: Relazione
+      - name: tipo
+        in: query
+        required: false
+        schema:
+          type: string
+          default: personale
+          title: Tipo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+              default: []
+              title: Assegnata A
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /npc/aggiorna-comportamento/:
+    post:
+      tags:
+      - npc
+      summary: Aggiorna Comportamento
+      operationId: aggiorna_comportamento_npc_aggiorna_comportamento__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /npc/reagisci/:
+    post:
+      tags:
+      - npc
+      summary: Reagisci
+      operationId: reagisci_npc_reagisci__post
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: evento
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Evento
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gruppi/crea/:
+    post:
+      tags:
+      - gruppi
+      summary: Crea Gruppo
+      operationId: crea_gruppo_gruppi_crea__post
+      parameters:
+      - name: nome
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Nome
+      - name: leader_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Leader Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gruppi/aggiungi-membro/:
+    post:
+      tags:
+      - gruppi
+      summary: Aggiungi Membro
+      operationId: aggiungi_membro_gruppi_aggiungi_membro__post
+      parameters:
+      - name: gruppo_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Gruppo Id
+      - name: personaggio_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Personaggio Id
+      - name: ruolo
+        in: query
+        required: false
+        schema:
+          type: string
+          default: membro
+          title: Ruolo
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gruppi/cambia-leader/:
+    put:
+      tags:
+      - gruppi
+      summary: Cambia Leader
+      operationId: cambia_leader_gruppi_cambia_leader__put
+      parameters:
+      - name: gruppo_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Gruppo Id
+      - name: nuovo_leader_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Nuovo Leader Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gruppi/stato/:
+    get:
+      tags:
+      - gruppi
+      summary: Stato Gruppo
+      operationId: stato_gruppo_gruppi_stato__get
+      parameters:
+      - name: gruppo_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Gruppo Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /gruppi/verifica-coesione/:
+    post:
+      tags:
+      - gruppi
+      summary: Verifica Coesione
+      operationId: verifica_coesione_gruppi_verifica_coesione__post
+      parameters:
+      - name: gruppo_id
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Gruppo Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    Personaggio:
-      type: object
+    HTTPValidationError:
       properties:
-        id:
-          type: string
-        nome:
-          type: string
-        eta:
-          type: integer
-        ruolo:
-          type: string
-        lingua:
-          type: string
-        stato:
-          type: string
-        salute:
-          type: integer
-        sanita_mentale:
-          type: integer
-        inventario:
-          type: object
-          additionalProperties:
-            type: integer
-        relazioni:
-          type: object
-          additionalProperties:
-            type: object
-            properties:
-              tipo:
-                type: string
-              fiducia:
-                type: integer
-        competenze:
-          type: array
+        detail:
           items:
-            type: string
-        ultimo_luogo:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
           type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

@@ -18,10 +18,21 @@ def get_db():
     finally:
         db.close()
 
+class PersonaggioIn(BaseModel):
+    nome: str
+    eta: Optional[int] = None
+    ruolo: str
+    lingua: Optional[str] = None
+
 TRATTI_POSITIVI = [k for k, v in TRATTI.items() if v["categoria"] == "positivo"]
 TRATTI_NEGATIVI = [k for k, v in TRATTI.items() if v["categoria"] == "negativo"]
 TRATTI_NEUTRI   = [k for k, v in TRATTI.items() if v["categoria"] == "neutro"]
 
+class PersonaggioIn(BaseModel):
+    nome: str
+    eta: Optional[int] = None
+    ruolo: str
+    lingua: Optional[str] = None
 
 def genera_tratti():
     positivi = random.sample(TRATTI_POSITIVI, k=2)
@@ -30,15 +41,37 @@ def genera_tratti():
     return positivi + negativi + neutri
 
 @router.post("/personaggi/")
-def crea_personaggio(p: dict, db: Session = Depends(get_db)):
-    p["id"] = str(uuid.uuid4())
-    personaggio = PersonaggioDB(**p)
-    db.add(personaggio)
-    db.commit()
-    p["tratti"] = genera_tratti()
-    db.refresh(personaggio)
-    return {"msg": f"Creato {personaggio.nome}", "id": personaggio.id}
+def crea_personaggio(p_in: PersonaggioIn, db: Session = Depends(get_db)):
+    new_id = str(uuid.uuid4())
+    try:
+        personaggio = PersonaggioDB(
+            id=new_id,
+            nome=p_in.nome,
+            eta=p_in.eta,
+            ruolo=p_in.ruolo,
+            lingua=p_in.lingua,
+            stato="vivo",
+            salute=100,
+            sanita_mentale=100,
+            inventario={},
+            relazioni={},
+            competenze=[],
+            ultimo_luogo="sconosciuto",
+            tratti=genera_tratti(),     # genero subito i tratti
+            traumi=[],
+            memorie=[],
+            intenzioni=[],
+            ultima_intenzione=None,
+            storico_intenzioni=[]
+        )
+        db.add(personaggio)
+        db.commit()
+        db.refresh(personaggio)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Errore creazione Personaggio: {e}")
 
+    return {"msg": f"Creato {personaggio.nome}", "id": personaggio.id}
+    
 @router.get("/personaggi/")
 def lista_personaggi(db: Session = Depends(get_db)):
     return db.query(PersonaggioDB).all()

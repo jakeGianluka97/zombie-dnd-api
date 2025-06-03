@@ -4,24 +4,24 @@ from database import Base
 
 class PersonaggioDB(Base):
     __tablename__ = "personaggi"
-    id = Column(String, primary_key=True, index=True)
-    nome = Column(String)
-    eta = Column(Integer)
-    ruolo = Column(String)
-    lingua = Column(String)
-    stato = Column(String, default="vivo")
-    salute = Column(Integer, default=100)
-    sanita_mentale = Column(Integer, default=100)
-    inventario = Column(JSON, default={})
-    relazioni = Column(JSON, default={})
-    competenze = Column(JSON, default=[])
-    ultimo_luogo = Column(String, default="sconosciuto")
-    tratti = Column(JSON, default=[]) 
-    traumi = Column(JSON, default=[])
-    memorie = Column(JSON, default=[])
-    intenzioni = Column(JSON, default=[]) 
+    id                = Column(String, primary_key=True, index=True)
+    nome              = Column(String)
+    eta               = Column(Integer)
+    ruolo             = Column(String)
+    lingua            = Column(String)
+    stato             = Column(String, default="vivo")
+    salute            = Column(Integer, default=100)
+    sanita_mentale    = Column(Integer, default=100)
+    inventario        = Column(JSON, default={}, nullable=True)
+    relazioni         = Column(JSON, default={}, nullable=True)
+    competenze        = Column(JSON, default=[], nullable=True)
+    ultimo_luogo      = Column(String, default="sconosciuto")
+    tratti            = Column(JSON, default=[], nullable=True)
+    traumi            = Column(JSON, default=[], nullable=True)
+    memorie           = Column(JSON, default=[], nullable=True)
+    intenzioni        = Column(JSON, default=[], nullable=True)
     ultima_intenzione = Column(String, default=None)
-    storico_intenzioni = Column(JSON, default=[])  # Lista cronologica
+    storico_intenzioni= Column(JSON, default=[], nullable=True)  
 
 
 
