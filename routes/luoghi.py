@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models_sql import LuogoDB, CollegamentoDB
 import uuid
+from pydantic import BaseModel
+from typing import Optional
 
 router = APIRouter()
 
@@ -13,15 +15,44 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/luoghi/")
-def crea_luogo(luogo: dict, db: Session = Depends(get_db)):
-    if db.query(LuogoDB).filter(LuogoDB.id == luogo["id"]).first():
-        return {"errore": "Luogo già esistente"}
-    nuovo = LuogoDB(**luogo)
-    db.add(nuovo)
-    db.commit()
-    return {"msg": f"Luogo '{luogo['nome']}' creato con successo"}
+class LuogoIn(BaseModel):
+    nome: str
+    descrizione: Optional[str] = None
 
+@router.post("/luoghi/", response_model=dict)
+def crea_luogo(luogo_in: LuogoIn, db: Session = Depends(get_db)):
+    # 2) Genera un nuovo UUID per il luogo
+    new_id = str(uuid.uuid4())
+
+    # 3) Se vuoi impedire la duplicazione basata sullo stesso nome,
+    #    controlla prima: (opzionale)
+    esistente = db.query(LuogoDB).filter(LuogoDB.nome == luogo_in.nome).first()
+    if esistente:
+        raise HTTPException(status_code=400, detail="Nome luogo già esistente")
+
+    # 4) Crea l’oggetto ORM valorizzando il nuovo ID e i campi mandatori.
+    #    Se nel tuo modello LuogoDB hai colonne JSON o altri campi "non null",
+    #    inizializzale qui. Supponiamo che LuogoDB abbia almeno (id, nome, descrizione, collegamenti).
+    try:
+        nuovo_luogo = LuogoDB(
+            id=new_id,
+            nome=luogo_in.nome,
+            descrizione=luogo_in.descrizione or "",
+            # Se hai colonne JSON, ad esempio:
+            collegamenti=[]   # lista vuota per i collegamenti iniziali
+        )
+        db.add(nuovo_luogo)
+        db.commit()
+        db.refresh(nuovo_luogo)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Errore creazione Luogo: {e}")
+
+    return {
+        "id": nuovo_luogo.id,
+        "nome": nuovo_luogo.nome,
+        "descrizione": nuovo_luogo.descrizione
+    }
+    
 @router.post("/collegamento/")
 def crea_collegamento(da_id: str, a_id: str, distanza: float, db: Session = Depends(get_db)):
     if not db.query(LuogoDB).filter(LuogoDB.id == da_id).first() or not db.query(LuogoDB).filter(LuogoDB.id == a_id).first():
