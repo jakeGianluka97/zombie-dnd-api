@@ -2,9 +2,12 @@ import json
 import uuid
 import random
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from models_sql import PersonaggioDB
 from database import SessionLocal
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Optional
 from core.tratti import TRATTI
 
 
@@ -71,7 +74,7 @@ def crea_personaggio(p_in: PersonaggioIn, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=f"Errore creazione Personaggio: {e}")
 
     return {"msg": f"Creato {personaggio.nome}", "id": personaggio.id}
-    
+
 @router.get("/personaggi/")
 def lista_personaggi(db: Session = Depends(get_db)):
     return db.query(PersonaggioDB).all()
